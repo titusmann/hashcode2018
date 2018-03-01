@@ -1,5 +1,6 @@
 package com.haschcode.pizza;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class City {
@@ -10,19 +11,19 @@ public class City {
 
     private List<Car> cars;
 
-    private List<Rides> rides;
+    private List<Ride> rides;
 
     private Integer bonus;
 
     private Integer maxTime;
 
-    public City(Integer rows, Integer columns, List<Car> cars, List<Rides> rides, Integer bonus, Integer maxTime) {
+    public City(Integer rows, Integer columns, List<Car> cars, Integer bonus, Integer maxTime) {
         this.rows = rows;
         this.columns = columns;
         this.cars = cars;
-        this.rides = rides;
         this.bonus = bonus;
         this.maxTime = maxTime;
+        this.rides = new ArrayList<>();
     }
 
 
@@ -50,11 +51,11 @@ public class City {
         this.cars = cars;
     }
 
-    public List<Rides> getRides() {
+    public List<Ride> getRides() {
         return rides;
     }
 
-    public void setRides(List<Rides> rides) {
+    public void setRides(List<Ride> rides) {
         this.rides = rides;
     }
 
@@ -72,5 +73,9 @@ public class City {
 
     public void setMaxTime(Integer maxTime) {
         this.maxTime = maxTime;
+    }
+
+    public void addRide(Ride ride){
+        this.rides.add(ride);
     }
 }

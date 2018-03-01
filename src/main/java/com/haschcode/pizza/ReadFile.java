@@ -1,25 +1,26 @@
 package com.haschcode.pizza;
 
-import com.haschcode.pizza.model.Pizza;
-
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ReadFile {
 
 
-    public static Pizza muestraContenido(String file) throws FileNotFoundException, IOException {
+    public static City muestraContenido(String file) throws FileNotFoundException, IOException {
         String cadena;
-        HashMap<Integer, Boolean> ingredients = new HashMap<>();
+
         int maxColumn = 0;
         int maxRows  = 0;
-        int maxCellsSlice  = 0;
-        int minIngredientSlice  = 0;
+        int numRides  = 0;
+        int numCars  = 0;
+        int bonus  = 0;
+        int maxTime  = 0;
+        City city = null;
         AtomicInteger row = new AtomicInteger(0);
 
         int cont = -1;
@@ -31,17 +32,32 @@ public class ReadFile {
             if (cont == -1) {
                 maxRows = Integer.parseInt(cadena.split(" ")[0]);
                 maxColumn = Integer.parseInt(cadena.split(" ")[1]);
-                minIngredientSlice = Integer.parseInt(cadena.split(" ")[2]);
-                maxCellsSlice = Integer.parseInt(cadena.split(" ")[3]);
+                numCars = Integer.parseInt(cadena.split(" ")[2]);
+                numRides = Integer.parseInt(cadena.split(" ")[3]);
+                bonus = Integer.parseInt(cadena.split(" ")[4]);
+                maxTime = Integer.parseInt(cadena.split(" ")[5]);
+                List<Car> cars = new ArrayList<>(numCars);
+                city = new City(maxColumn, maxRows, cars, bonus, maxTime);
             } else {
-                Arrays.stream(cadena.split("")).forEach(i -> ingredients.put(row.getAndIncrement(), i.equals("T")));
+                city.addRide( new Ride(Integer.parseInt(cadena.split(" ")[0]),
+                                Integer.parseInt(cadena.split(" ")[1]),
+                                Integer.parseInt(cadena.split(" ")[2]),
+                                Integer.parseInt(cadena.split(" ")[3]),
+                                Integer.parseInt(cadena.split(" ")[4]),
+                                Integer.parseInt(cadena.split(" ")[5]),
+                                cont
+                                ));
+
             }
             cont++;
         }
+
+
         
 
         b.close();
-        return  new Pizza(maxColumn, maxRows, maxCellsSlice, minIngredientSlice, ingredients);
+        System.out.print(city);
+        return city ;
     }
 
 }

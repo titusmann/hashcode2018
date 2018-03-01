@@ -1,6 +1,6 @@
 package com.haschcode.pizza;
 
-public class Rides {
+public class Ride {
 
     private Integer rowInitial;
     private Integer rowEnd;
@@ -11,7 +11,7 @@ public class Rides {
 
     private int id;
 
-    public Rides(Integer rowInitial, Integer rowEnd, Integer columnInitial, Integer columnEnd, Integer timeInitial, Integer timeEnd, int id) {
+    public Ride(Integer rowInitial, Integer rowEnd, Integer columnInitial, Integer columnEnd, Integer timeInitial, Integer timeEnd, int id) {
         this.rowInitial = rowInitial;
         this.rowEnd = rowEnd;
         this.columnInitial = columnInitial;

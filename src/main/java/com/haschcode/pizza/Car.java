@@ -8,7 +8,7 @@ public class Car {
     private Integer columnPos;
     private Integer rowPos;
     private Integer time;
-    private List<Rides> rides = new ArrayList<>();
+    private List<Ride> rides = new ArrayList<>();
 
     public Car() {
     }
@@ -37,11 +37,11 @@ public class Car {
         this.time = time;
     }
 
-    public List<Rides> getRides() {
+    public List<Ride> getRides() {
         return rides;
     }
 
-    public void setRides(List<Rides> rides) {
+    public void setRides(List<Ride> rides) {
         this.rides = rides;
     }
 }
