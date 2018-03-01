@@ -5,9 +5,9 @@ import java.util.List;
 
 public class Car {
 
-    private Integer columnPos;
-    private Integer rowPos;
-    private Integer time;
+    private Integer columnPos = 0;
+    private Integer rowPos = 0;
+    private Integer time = 0;
     private List<Ride> rides = new ArrayList<>();
 
     public Car() {
@@ -43,5 +43,15 @@ public class Car {
 
     public void setRides(List<Ride> rides) {
         this.rides = rides;
+    }
+
+    @Override
+    public String toString() {
+        return "Car{" +
+                "columnPos=" + columnPos +
+                ", rowPos=" + rowPos +
+                ", time=" + time +
+                ", rides=" + rides +
+                '}';
     }
 }

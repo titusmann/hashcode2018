@@ -76,4 +76,17 @@ public class Ride {
     public void setId(int id) {
         this.id = id;
     }
+
+    @Override
+    public String toString() {
+        return "Ride{" +
+                "rowInitial=" + rowInitial +
+                ", rowEnd=" + rowEnd +
+                ", columnInitial=" + columnInitial +
+                ", columnEnd=" + columnEnd +
+                ", timeInitial=" + timeInitial +
+                ", timeEnd=" + timeEnd +
+                ", id=" + id +
+                '}';
+    }
 }

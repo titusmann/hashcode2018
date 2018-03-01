@@ -78,4 +78,17 @@ public class City {
     public void addRide(Ride ride){
         this.rides.add(ride);
     }
+
+
+    @Override
+    public String toString() {
+        return "City{" +
+                "rows=" + rows +
+                ", columns=" + columns +
+                ", cars=" + cars +
+                ", rides=" + rides +
+                ", bonus=" + bonus +
+                ", maxTime=" + maxTime +
+                '}';
+    }
 }
