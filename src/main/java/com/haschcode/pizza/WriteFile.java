@@ -30,10 +30,9 @@ public class WriteFile {
 //        b.close();
 //    }
 
-    public static void imprimeCortes(List<Car> cars) throws FileNotFoundException, IOException {
-        String file = "C:\\Users\\fjbelaza\\Documents\\hashcode2018\\src\\main\\resources\\a_example.out";
+    public static void imprimeCortes(List<Car> cars, String file) throws FileNotFoundException, IOException {
 
-        FileWriter f = new FileWriter(file, true);
+        FileWriter f = new FileWriter(file, false);
         BufferedWriter b = new BufferedWriter(f);
 
 
@@ -47,7 +46,7 @@ public class WriteFile {
                 }
             } else {
                 // SIn rides
-                b.write("0" + "\t" + "0");
+                b.write("0");
 
             }
             b.newLine();

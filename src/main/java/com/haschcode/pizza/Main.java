@@ -6,9 +6,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
-import static java.lang.Math.abs;
-import static java.lang.Math.max;
-import static java.lang.Math.min;
+import static java.lang.Math.*;
 
 public class Main {
 
@@ -19,115 +17,114 @@ public class Main {
 
 //    public static List<Slice> slices;
 
+
 //    public static AtomicInteger contador = new AtomicInteger(0);
 
     public static void main(String[] args) {
         city = null;
+        List<String> arrayFile = new ArrayList<>();
+        arrayFile.add("a_example");
+        arrayFile.add("b_should_be_easy");
+        arrayFile.add("c_no_hurry");
+        arrayFile.add("d_metropolis");
+        arrayFile.add("e_high_bonus");
+        for (String file : arrayFile) {
+            final Comparator<Car> comp = (c1, c2) -> Integer.compare(c1.getTime(), c2.getTime());
 
-        final Comparator<Car> comp = (c1, c2) -> Integer.compare( c1.getTime(), c2.getTime());
+            HashMap<Integer, Integer> weightCell = new HashMap<>();
+            try {
+                city = ReadFile.muestraContenido(args[0] + "\\" + file + ".in");
 
-        HashMap<Integer, Integer> weightCell = new HashMap<>();
-        try {
-            city = ReadFile.muestraContenido(args[0]);
+                // Seleccionar el vehículo disponible antes.
+                boolean viajeRealizado = false;
+                do {
+                    viajeRealizado = false;
+                    int contador = 0;
+                    Car car = city.getCars().stream().min(comp).get();
 
-            // Seleccionar el vehículo disponible antes.
-            boolean viajeRealizado = false;
-            do{
-                viajeRealizado = false;
-                int contador= 0;
-                Car car = city.getCars().stream().min(comp).get();
+                    if (car.getTime() < city.getMaxTime()) {
+                        viajeRealizado = true;
+                        List<Ride> ridesMin = new ArrayList<>();
+                        int tiempoRidesMin = 99999999;
 
-                List<Ride> ridesMin = new ArrayList<>() ;
-                int tiempoRidesMin = 99999999;
-                for(Ride ride:city.getRides()){
-                    int tiempo = distancia(ride,car);
-                    if(checkFinal(ride,car,tiempo)) {
-                        if (tiempo == tiempoRidesMin) {
-                            ridesMin.add(ride);
+                        double baremoMax = 0.0;
+                        Ride rideFinal = null;
+                        for(Ride ride : city.getRides()){
+                            double distanciaTotal = sqrt(pow(distancia(ride,car),2) + pow(tiempoDeRide(ride),2));
+                            int puntuacion = getPuntuacion(ride,llegaATiempoParaBonus(ride,car));
 
-                        } else if (tiempo < tiempoRidesMin) {
-                            ridesMin.clear();
-                            ridesMin.add(ride);
-                            tiempoRidesMin = tiempo;
+                            double baremo = (double) puntuacion / (distanciaTotal);
+
+                            if(baremo > baremoMax ){
+                                baremoMax = baremo;
+                                rideFinal = ride;
+                            } else if (baremo == baremoMax){
+                                if (getPuntuacion(ride,llegaATiempoParaBonus(ride,car)) > getPuntuacion(rideFinal,llegaATiempoParaBonus(ride,car))){
+                                    rideFinal = ride;
+                                }
+                            }
                         }
-                    }
-                }
 
-                // En caso de empate, seleccionar la puntuación menor.
 
-                Ride rideFinal = null;
+                        //Ride rideFinal = ridePuntuacion.size()>0?ridePuntuacion.get(0):null;
+                        if (rideFinal != null) {
+                            city.removeRide(rideFinal);
+                            car.addRide(rideFinal);
+                            car.setColumnPos(rideFinal.getColumnEnd());
+                            car.setRowPos(rideFinal.getRowEnd());
 
-                int puntuacion = 0;
-                if(ridesMin.size() > 1) {
-                    for(Ride ride : ridesMin){
-                        int p = getPuntuacion(ride, llegaATiempoParaBonus(ride,car));
-                        if(p > puntuacion) {
-                            rideFinal = ride;
-                            puntuacion = p;
+                            car.setTime(car.getTime() + distancia(rideFinal, car) + tiempoDeRide(rideFinal));
+                        } else {
+                            car.setTime(city.getMaxTime() + 1);
                         }
+
+                        // Una vez seleccionado, calcular la pos y las coordenadas del car.
+
                     }
-                } else if (ridesMin.size() == 1) {
-                    rideFinal = ridesMin.get(0);
-                }
-
-                if(rideFinal != null) {
-                    viajeRealizado = true;
-                    city.removeRide(rideFinal);
-                    car.addRide(rideFinal);
-                    car.setColumnPos(rideFinal.getColumnEnd());
-                    car.setRowPos(rideFinal.getRowEnd());
-
-                    car.setTime(car.getTime() + distancia(rideFinal, car) + tiempoDeRide(rideFinal));
-                }
-
-                // Una vez seleccionado, calcular la pos y las coordenadas del car.
+                } while (viajeRealizado);
 
 
-            }while(viajeRealizado);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            WriteFile.imprimeCortes(city.getCars());
-        } catch (IOException e) {
-            e.printStackTrace();
+            try {
+                WriteFile.imprimeCortes(city.getCars(), args[0] + "\\" + file + ".out");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
     }
 
-    public static int distancia(Ride ride, Car car){
+    public static int distancia(Ride ride, Car car) {
         int tiempoMinimo = ride.getTimeInitial() - car.getTime();
         int tiempoDistancia = abs(car.getColumnPos() - ride.getColumnInitial()) + abs(car.getRowPos() - ride.getRowInitial());
 
         return max(tiempoDistancia, tiempoMinimo);
     }
 
-    public static int tiempoDeRide(Ride ride){
+    public static int tiempoDeRide(Ride ride) {
         return abs(ride.getRowEnd() - ride.getRowInitial()) + abs(ride.getColumnEnd() - ride.getColumnInitial());
     }
 
-    public static int getPuntuacion(Ride ride, boolean conBonus){
-        int puntuacion = (ride.getColumnEnd()-ride.getColumnInitial())+(ride.getRowEnd()-ride.getRowInitial());
-        return conBonus? puntuacion + city.getBonus():puntuacion;
+    public static int getPuntuacion(Ride ride, boolean conBonus) {
+        int puntuacion = abs(ride.getColumnEnd() - ride.getColumnInitial()) + abs(ride.getRowEnd() - ride.getRowInitial());
+        return conBonus ? puntuacion + city.getBonus() : puntuacion;
     }
 
-    public static boolean llegaATiempoParaBonus(Ride ride, Car car){
+    public static boolean llegaATiempoParaBonus(Ride ride, Car car) {
         int tiempoEnLlegar = abs(car.getColumnPos() - ride.getColumnInitial()) + abs(car.getRowPos() - ride.getRowInitial());
-        return !(car.getTime()+tiempoEnLlegar>ride.getTimeInitial());
+        return !(car.getTime() + tiempoEnLlegar > ride.getTimeInitial());
     }
 
-    public static boolean checkFinal(Ride ride, Car car,int tiempo){
-        return ride.getTimeEnd() >= car.getTime() + tiempo + getPuntuacion(ride,false);
+    public static boolean checkFinal(Ride ride, Car car, int tiempo) {
+        return ride.getTimeEnd() >= car.getTime() + tiempo + getPuntuacion(ride, false);
     }
 
 }
 
-        //System.out.println(pizza.toString());
+//System.out.println(pizza.toString());
 //        HashMap<Integer, Integer> weightCells = new HashMap<>();
 //
 //        System.out.println("Leido el mapa. Calculando pesos.");
