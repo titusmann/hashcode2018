@@ -79,6 +79,10 @@ public class City {
         this.rides.add(ride);
     }
 
+    public void removeRide(Ride ride){
+        this.rides.remove(ride);
+    }
+
 
     @Override
     public String toString() {

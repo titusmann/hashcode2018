@@ -1,7 +1,14 @@
 package com.haschcode.pizza;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
+
+import static java.lang.Math.abs;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 
 public class Main {
 
@@ -9,31 +16,116 @@ public class Main {
 
     public static City city;
 
+
 //    public static List<Slice> slices;
 
 //    public static AtomicInteger contador = new AtomicInteger(0);
 
     public static void main(String[] args) {
-        //System.out.println("Hello World!");
         city = null;
-//        slices = new ArrayList<>();
+
+        final Comparator<Car> comp = (c1, c2) -> Integer.compare( c1.getTime(), c2.getTime());
 
         HashMap<Integer, Integer> weightCell = new HashMap<>();
         try {
             city = ReadFile.muestraContenido(args[0]);
 
-//            comb = combinaciones();
+            // Seleccionar el vehículo disponible antes.
+            boolean viajeRealizado = false;
+            do{
+                viajeRealizado = false;
+                int contador= 0;
+                Car car = city.getCars().stream().min(comp).get();
 
-            //for(int i = 0; i<pizza.getMapIngredient().size(); i++){
-            //    int weight = 0;
-            //    weight = weightOfCell(i,pizza);
+                List<Ride> ridesMin = new ArrayList<>() ;
+                int tiempoRidesMin = 99999999;
+                for(Ride ride:city.getRides()){
+                    int tiempo = distancia(ride,car);
+                    if(checkFinal(ride,car,tiempo)) {
+                        if (tiempo == tiempoRidesMin) {
+                            ridesMin.add(ride);
 
-            //    weightCell.put(i,weight);
-            //}
+                        } else if (tiempo < tiempoRidesMin) {
+                            ridesMin.clear();
+                            ridesMin.add(ride);
+                            tiempoRidesMin = tiempo;
+                        }
+                    }
+                }
+
+                // En caso de empate, seleccionar la puntuación menor.
+
+                Ride rideFinal = null;
+
+                int puntuacion = 0;
+                if(ridesMin.size() > 1) {
+                    for(Ride ride : ridesMin){
+                        int p = getPuntuacion(ride, llegaATiempoParaBonus(ride,car));
+                        if(p > puntuacion) {
+                            rideFinal = ride;
+                            puntuacion = p;
+                        }
+                    }
+                } else if (ridesMin.size() == 1) {
+                    rideFinal = ridesMin.get(0);
+                }
+
+                if(rideFinal != null) {
+                    viajeRealizado = true;
+                    city.removeRide(rideFinal);
+                    car.addRide(rideFinal);
+                    car.setColumnPos(rideFinal.getColumnEnd());
+                    car.setRowPos(rideFinal.getRowEnd());
+
+                    car.setTime(car.getTime() + distancia(rideFinal, car) + tiempoDeRide(rideFinal));
+                }
+
+                // Una vez seleccionado, calcular la pos y las coordenadas del car.
+
+
+            }while(viajeRealizado);
+
+
+
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        try {
+            WriteFile.imprimeCortes(city.getCars());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static int distancia(Ride ride, Car car){
+        int tiempoMinimo = ride.getTimeInitial() - car.getTime();
+        int tiempoDistancia = abs(car.getColumnPos() - ride.getColumnInitial()) + abs(car.getRowPos() - ride.getRowInitial());
+
+        return max(tiempoDistancia, tiempoMinimo);
+    }
+
+    public static int tiempoDeRide(Ride ride){
+        return abs(ride.getRowEnd() - ride.getRowInitial()) + abs(ride.getColumnEnd() - ride.getColumnInitial());
+    }
+
+    public static int getPuntuacion(Ride ride, boolean conBonus){
+        int puntuacion = (ride.getColumnEnd()-ride.getColumnInitial())+(ride.getRowEnd()-ride.getRowInitial());
+        return conBonus? puntuacion + city.getBonus():puntuacion;
+    }
+
+    public static boolean llegaATiempoParaBonus(Ride ride, Car car){
+        int tiempoEnLlegar = abs(car.getColumnPos() - ride.getColumnInitial()) + abs(car.getRowPos() - ride.getRowInitial());
+        return !(car.getTime()+tiempoEnLlegar>ride.getTimeInitial());
+    }
+
+    public static boolean checkFinal(Ride ride, Car car,int tiempo){
+        return ride.getTimeEnd() >= car.getTime() + tiempo + getPuntuacion(ride,false);
+    }
+
+}
 
         //System.out.println(pizza.toString());
 //        HashMap<Integer, Integer> weightCells = new HashMap<>();
@@ -85,15 +177,6 @@ public class Main {
 //
 //        // TODO: Cambiar el Hashmap a un Sortmap ordenado por values.
 //        // TODO: Recalcular el peso solo de las casillas a pizza.getMaxCellsSlice() de distancia de la zona recortada.
-
-        try {
-            WriteFile.imprimeCortes(city.getCars());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
 //    public static List<String> combinaciones(){
 //        List<String> result = new ArrayList<>();
 //        Integer max = pizza.getMaxCellsSlice();
@@ -215,4 +298,4 @@ public class Main {
 //                        LinkedHashMap::new
 //                ));
 //    }
-}
+

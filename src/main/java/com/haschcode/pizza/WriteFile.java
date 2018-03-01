@@ -31,7 +31,7 @@ public class WriteFile {
 //    }
 
     public static void imprimeCortes(List<Car> cars) throws FileNotFoundException, IOException {
-        String file = "C:\\Development\\Workspace\\hashcode2018\\src\\main\\resources\\salid.out";
+        String file = "C:\\Users\\fjbelaza\\Documents\\hashcode2018\\src\\main\\resources\\a_example.out";
 
         FileWriter f = new FileWriter(file, true);
         BufferedWriter b = new BufferedWriter(f);

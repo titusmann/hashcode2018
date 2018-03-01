@@ -45,6 +45,11 @@ public class Car {
         this.rides = rides;
     }
 
+    public void addRide(Ride ride) {
+        this.rides.add(ride);
+    }
+
+
     @Override
     public String toString() {
         return "Car{" +
